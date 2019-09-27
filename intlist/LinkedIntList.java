@@ -135,12 +135,21 @@ public class LinkedIntList {
      * use 'new'.
      */
     public static void extend(LinkedIntList A, LinkedIntList B) {
-        if (A != null && A.front != null && B != null && B.front != null) {
-            ListNode currentA = A.front;
-            while (currentA.next != null) {
-                currentA = currentA.next;
+        if (B != null && B.front != null) {
+            if (A == null) {
+                A = new LinkedIntList();
             }
-            currentA.next = B.front;
+            if (A.front == null) {
+                A.front = B.front;
+            } else {
+                ListNode currentA = A.front;
+                System.out.print(currentA);
+                while (currentA.next != null) {
+                    currentA = currentA.next;
+                }
+                currentA.next = B.front;
+            }
+
         }
     }
 
@@ -149,33 +158,41 @@ public class LinkedIntList {
      * of B. May NOT modify items of A or B. Use 'new'.
      */
     public static LinkedIntList concatenated(LinkedIntList A, LinkedIntList B) {
-        if (A != null && A.front != null && B != null && B.front != null) {
-            LinkedIntList result = new LinkedIntList();
+        LinkedIntList result = new LinkedIntList();
+        ListNode currentResult = null;
+        if (A != null && A.front != null) {
             ListNode currentA = A.front;
+
             result.front = new ListNode(currentA.data);
-            ListNode currentResult = result.front;
+            currentResult = result.front;
 
             while (currentA.next != null) {
                 currentA = currentA.next;
                 currentResult.next = new ListNode(currentA.data);
-                if (currentA.next != null) {
-                    currentResult = currentResult.next;
-                }
+                currentResult = currentResult.next;
             }
 
+        }
+
+        if (B != null && B.front != null) {
             ListNode currentB = B.front;
-            currentResult.next = new ListNode(currentB.data);
+
+            if (A == null || A.front == null) {
+                result.front = new ListNode(currentB.data);
+                currentResult = result.front;
+            } else {
+                currentResult.next = new ListNode(currentB.data);
+                currentResult = currentResult.next;
+            }
 
             while (currentB.next != null) {
                 currentB = currentB.next;
                 currentResult.next = new ListNode(currentB.data);
                 currentResult = currentResult.next;
             }
-            return result;
-        } else {
-            return null;
         }
 
+        return result;
     }
 
     // You don't need to look at or understand the methods below this comment.
