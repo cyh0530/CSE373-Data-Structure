@@ -1,6 +1,8 @@
 package intlist;
 
-/** Represents a linked list of integer data. */
+/**
+ * Represents a linked list of integer data.
+ */
 public class LinkedIntList {
 
     public ListNode front;
@@ -19,12 +21,16 @@ public class LinkedIntList {
         }
     }
 
-    /** An empty LinkedIntList. */
+    /**
+     * An empty LinkedIntList.
+     */
     public LinkedIntList() {
         // Empty LinkedIntList
     }
 
-    /** Returns a new LinkedIntList containing the ints in args. */
+    /**
+     * Returns a new LinkedIntList containing the ints in args.
+     */
     public LinkedIntList(int... args) {
         if (args.length != 0) {
             front = new ListNode(args[0]);
@@ -36,7 +42,9 @@ public class LinkedIntList {
         }
     }
 
-    /** Return a new LinkedIntList with the given ListNode. */
+    /**
+     * Return a new LinkedIntList with the given ListNode.
+     */
     private LinkedIntList(ListNode front) {
         this.front = front;
     }
@@ -44,7 +52,9 @@ public class LinkedIntList {
     // Note that lowercase variable names are ListNodes while uppercase
     // variable names are LinkedIntLists.
 
-    /** Squares all of the integers in the list L. Destructive. */
+    /**
+     * Squares all of the integers in the list L. Destructive.
+     */
     public static void square(LinkedIntList L) {
         if (L != null) {
             ListNode p = L.front;
@@ -55,7 +65,9 @@ public class LinkedIntList {
         }
     }
 
-    /** Returns a list equal to L with all integers squared. Non-destructive. */
+    /**
+     * Returns a list equal to L with all integers squared. Non-destructive.
+     */
     public static LinkedIntList iterativeSquared(LinkedIntList L) {
         if (L == null) {
             return null;
@@ -74,7 +86,9 @@ public class LinkedIntList {
         return new LinkedIntList(front);
     }
 
-    /** Returns a list equal to L with all integers squared. Non-destructive. */
+    /**
+     * Returns a list equal to L with all integers squared. Non-destructive.
+     */
     public static LinkedIntList recursiveSquared(LinkedIntList L) {
         if (L == null) {
             return null;
@@ -86,7 +100,9 @@ public class LinkedIntList {
         }
     }
 
-    /** Helper method to do the actual recursion for recursiveSquared. */
+    /**
+     * Helper method to do the actual recursion for recursiveSquared.
+     */
     private static ListNode recursiveSquaredHelper(ListNode p) {
         if (p == null) {
             return null;
@@ -96,10 +112,22 @@ public class LinkedIntList {
         }
     }
 
-    /** Moves the first integer to the back of the list. */
+    /**
+     * Moves the first integer to the back of the list.
+     */
     public static void firstToLast(LinkedIntList L) {
-        // TODO: your code here
-        throw new UnsupportedOperationException("Not implemented yet.");
+        if (L != null && L.front != null) {
+            ListNode p = L.front;
+            ListNode originalFront = L.front;
+            while (p.next != null) {
+                p = p.next;
+            }
+
+            p.next = originalFront; // final next is front
+            L.front = originalFront.next; // second become front
+            originalFront.next = null;
+
+        }
     }
 
     /**
@@ -107,8 +135,13 @@ public class LinkedIntList {
      * use 'new'.
      */
     public static void extend(LinkedIntList A, LinkedIntList B) {
-        // TODO: your code here
-        throw new UnsupportedOperationException("Not implemented yet.");
+        if (A != null && A.front != null && B != null && B.front != null) {
+            ListNode currentA = A.front;
+            while (currentA.next != null) {
+                currentA = currentA.next;
+            }
+            currentA.next = B.front;
+        }
     }
 
     /**
@@ -116,8 +149,33 @@ public class LinkedIntList {
      * of B. May NOT modify items of A or B. Use 'new'.
      */
     public static LinkedIntList concatenated(LinkedIntList A, LinkedIntList B) {
-        // TODO: your code here
-        throw new UnsupportedOperationException("Not implemented yet.");
+        if (A != null && A.front != null && B != null && B.front != null) {
+            LinkedIntList result = new LinkedIntList();
+            ListNode currentA = A.front;
+            result.front = new ListNode(currentA.data);
+            ListNode currentResult = result.front;
+
+            while (currentA.next != null) {
+                currentA = currentA.next;
+                currentResult.next = new ListNode(currentA.data);
+                if (currentA.next != null) {
+                    currentResult = currentResult.next;
+                }
+            }
+
+            ListNode currentB = B.front;
+            currentResult.next = new ListNode(currentB.data);
+
+            while (currentB.next != null) {
+                currentB = currentB.next;
+                currentResult.next = new ListNode(currentB.data);
+                currentResult = currentResult.next;
+            }
+            return result;
+        } else {
+            return null;
+        }
+
     }
 
     // You don't need to look at or understand the methods below this comment.
@@ -144,7 +202,9 @@ public class LinkedIntList {
         return p == null && l == null;
     }
 
-    /** You are not expected to read or understand this method. */
+    /**
+     * You are not expected to read or understand this method.
+     */
     @Override
     public int hashCode() {
         if (front == null) {
@@ -157,7 +217,7 @@ public class LinkedIntList {
     /**
      * If a cycle exists in the LinkedIntList, this method returns an integer equal
      * to the item number of the location where the cycle is detected.
-     *
+     * <p>
      * If there is no cycle, the number 0 is returned instead. This is a
      * utility method for lab2. You are not expected to read, understand, or
      * even use this method. The point of this method is so that if you convert
