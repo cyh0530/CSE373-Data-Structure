@@ -40,32 +40,4 @@ public class ArrayDequeTest {
         // Failing test
         assertEquals(1, (int) deque.removeLast());
     }
-
-    @Test
-    public void test() {
-        ArrayDeque<Integer> d = new ArrayDeque<>();
-        d.addFirst(0);
-        d.addLast(1);
-        d.addFirst(2);
-        d.removeFirst();
-        d.addFirst(4);
-        d.addLast(5);
-        d.addLast(6);
-        d.addFirst(7);
-        d.removeLast();
-        d.addLast(9);
-        d.addLast(10);
-        d.addFirst(11);
-        d.addFirst(12);
-        d.removeFirst()     ;//==> 12
-        d.removeLast()      ;//==> 10
-        d.get(6)      ;//==> 9
-        d.removeFirst()  ;//   ==> 11
-        d.removeLast()      ;//==> 9
-        d.removeLast()     ;// ==> 5
-        d.get(2)     ;// ==> 0
-        d.removeLast() ;//     ==> 1
-        d.removeLast();
-        System.out.println();
-    }
 }
