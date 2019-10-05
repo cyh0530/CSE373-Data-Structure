@@ -36,7 +36,7 @@ public class Palindrome {
         return isPalindrome(deque, cc);
     }
 
-    public boolean isPalindrome(Deque<Character> deque, CharacterComparator cc) {
+    private boolean isPalindrome(Deque<Character> deque, CharacterComparator cc) {
         if (deque.size() < 2) {
             return true;
         } else {

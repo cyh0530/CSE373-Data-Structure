@@ -78,7 +78,7 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     public T get(int index) {
-        if (index >= size) {
+        if (index >= data.length) {
             return null;
         } else {
             int place = front + 1 + index;
