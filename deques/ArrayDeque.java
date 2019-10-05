@@ -110,11 +110,9 @@ public class ArrayDeque<T> implements Deque<T> {
     private void resize(int capacity) {
         T[] newData = (T[]) new Object[capacity];
         int i = increment(front, data.length);
-        System.out.println("front = " + front + ", size = " + size + ", back = " + back);
         for (int newIndex = 0; newIndex < size; newIndex += 1) {
-            System.out.println("new Index = " + newIndex + ", i = " + i);
             newData[newIndex] = data[i];
-            i = increment(i, size);
+            i = increment(i, data.length);
         }
         front = newData.length - 1;
         back = size;
