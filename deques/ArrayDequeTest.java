@@ -40,4 +40,28 @@ public class ArrayDequeTest {
         // Failing test
         assertEquals(1, (int) deque.removeLast());
     }
+
+    @Test
+    public void test() {
+        ArrayDeque<Integer> d = new ArrayDeque<>();
+        for (int i = 0; i < 31; i++) {
+            d.addLast(i);
+        }
+
+        for (int i = 0; i < 7; i++) {
+            d.removeFirst();
+        }
+
+        d.addLast(31);
+        for (int i = 0; i < 7; i++) {
+            d.addLast(i);
+        }
+        for (int i = 0; i < 20; i++) {
+            d.removeFirst();
+        }
+        while (!d.isEmpty()) {
+            d.removeFirst();
+        }
+        System.out.println();
+    }
 }

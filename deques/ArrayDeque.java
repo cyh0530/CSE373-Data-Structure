@@ -78,7 +78,7 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     public T get(int index) {
-        if (index >= data.length) {
+        if (index >= size) {
             return null;
         } else {
             int place = front + 1 + index;
@@ -112,7 +112,7 @@ public class ArrayDeque<T> implements Deque<T> {
         int i = increment(front, data.length);
         for (int newIndex = 0; newIndex < size; newIndex += 1) {
             newData[newIndex] = data[i];
-            i = increment(i, size);
+            i = increment(i, newData.length);
         }
         front = newData.length - 1;
         back = size;

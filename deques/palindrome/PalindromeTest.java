@@ -45,6 +45,7 @@ public class PalindromeTest {
         CharacterComparator cc = new OffByOne();
         assertTrue(palindrome.isPalindrome("flake", cc));
         assertTrue(palindrome.isPalindrome("climb", cc));
+        assertFalse(palindrome.isPalindrome("Climb", cc));
         assertFalse(palindrome.isPalindrome("civic", cc));
         assertFalse(palindrome.isPalindrome("zooms", cc));
 
