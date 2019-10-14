@@ -5,6 +5,11 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
 public class TermTest {
+
+    @Test
+    public void testConstructor() {
+        Term a = new Term(null, 0);
+    }
     @Test
     public void testSimpleCompareTo() {
         Term a = new Term("autocomplete", 0);

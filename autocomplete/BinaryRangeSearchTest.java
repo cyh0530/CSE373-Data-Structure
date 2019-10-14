@@ -78,8 +78,8 @@ public class BinaryRangeSearchTest {
     // Write more unit tests below.
     @Test
     public void testCities() {
-        Term[] terms = binaryAuto.allMatches("fremont");
-        for (Term term: terms) {
+        Term[] termsMatch = binaryAuto.allMatches("fremont");
+        for (Term term: termsMatch) {
             System.out.println(term.query());
 
         }

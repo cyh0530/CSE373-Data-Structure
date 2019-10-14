@@ -12,31 +12,39 @@ public class BinaryRangeSearch implements Autocomplete {
      * @throws IllegalArgumentException if terms is null or contains null
      */
     public BinaryRangeSearch(Term[] terms) {
+        if (terms == null) {
+            throw new IllegalArgumentException();
+        }
+        for (Term term: terms) {
+            if (term == null) {
+                throw new IllegalArgumentException();
+            }
+        }
         mergeSort(terms);
         this.terms = terms;
     }
 
-    private void mergeSort(Term[] terms) {
-        if (terms.length > 1) {
-            Term[] left = Arrays.copyOfRange(terms, 0, terms.length / 2);
-            Term[] right = Arrays.copyOfRange(terms, terms.length / 2, terms.length);
+    private void mergeSort(Term[] result) {
+        if (result.length > 1) {
+            Term[] left = Arrays.copyOfRange(result, 0, result.length / 2);
+            Term[] right = Arrays.copyOfRange(result, result.length / 2, result.length);
 
             mergeSort(left);
             mergeSort(right);
 
-            merge(terms, left, right);
+            merge(result, left, right);
         }
     }
 
-    private void merge(Term[] terms, Term[] left, Term[] right) {
+    private void merge(Term[] result, Term[] left, Term[] right) {
         int i1 = 0;
         int i2 = 0;
-        for (int i = 0; i < terms.length; i++) {
+        for (int i = 0; i < result.length; i++) {
             if (i2 >= right.length || (i1 < left.length && left[i1].compareTo(right[i2]) <= 0)) {
-                terms[i] = left[i1];
+                result[i] = left[i1];
                 i1++;
             } else {
-                terms[i] = right[i2];
+                result[i] = right[i2];
                 i2++;
             }
         }
