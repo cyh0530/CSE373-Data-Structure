@@ -1,8 +1,10 @@
 package autocomplete;
 
-public class LinearRangeSearch implements Autocomplete {
-    // TODO: add fields as necessary
+import java.util.*;
 
+public class LinearRangeSearch implements Autocomplete {
+
+    private Term[] terms;
     /**
      * Validates and stores the given array of terms.
      * Assumes that the given array will not be used externally afterwards (and thus may directly
@@ -10,8 +12,16 @@ public class LinearRangeSearch implements Autocomplete {
      * @throws IllegalArgumentException if terms is null or contains null
      */
     public LinearRangeSearch(Term[] terms) {
-        // TODO: replace this with your code
-        throw new UnsupportedOperationException("Not implemented yet: replace this with your code.");
+        if (terms == null) {
+            throw new IllegalArgumentException();
+        }
+        for (Term term: terms) {
+            if (term.query() == null) {
+                throw new IllegalArgumentException();
+            }
+        }
+        this.terms = terms;
+
     }
 
     /**
@@ -19,8 +29,21 @@ public class LinearRangeSearch implements Autocomplete {
      * @throws IllegalArgumentException if prefix is null
      */
     public Term[] allMatches(String prefix) {
-        // TODO: replace this with your code
-        throw new UnsupportedOperationException("Not implemented yet: replace this with your code.");
+        if (prefix == null) {
+            throw new IllegalArgumentException();
+        }
+        List<Term> match = new ArrayList<>();
+        for (Term term: terms) {
+            if (term.query().startsWith(prefix)) {
+                match.add(term);
+            }
+        }
+
+        Term[] result = new Term[match.size()];
+        result = match.toArray(result);
+        Arrays.sort(result, TermComparators.byReverseWeightOrder());
+
+        return result;
     }
 }
 

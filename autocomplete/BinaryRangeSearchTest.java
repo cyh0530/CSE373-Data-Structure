@@ -61,12 +61,27 @@ public class BinaryRangeSearchTest {
             new Term("welcome", 0),
             new Term("to", 0),
             new Term("autocomplete", 0),
+            new Term("meme", 10),
+            new Term("meadsf", 4),
+            new Term("meavacs", 8),
             new Term("me", 0)
         };
+
+
         BinaryRangeSearch brs = new BinaryRangeSearch(moreTerms);
+        Term[] t = brs.allMatches("auto");
         Term[] expected = new Term[]{new Term("autocomplete", 0)};
-        assertTermsEqual(expected, brs.allMatches("auto"));
+        assertTermsEqual(expected, t);
+
     }
 
     // Write more unit tests below.
+    @Test
+    public void testCities() {
+        Term[] terms = binaryAuto.allMatches("fremont");
+        for (Term term: terms) {
+            System.out.println(term.query());
+
+        }
+    }
 }
