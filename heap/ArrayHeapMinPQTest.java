@@ -2,11 +2,14 @@ package heap;
 
 import org.junit.Test;
 
+import java.util.Random;
+import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 public class ArrayHeapMinPQTest {
     /* Be sure to write randomized tests that can handle millions of items. To
@@ -15,121 +18,115 @@ public class ArrayHeapMinPQTest {
 
     @Test (expected = IllegalArgumentException.class)
     public void testAdd1() {
-        ArrayHeapMinPQ<Integer> heap = new ArrayHeapMinPQ<>();
-        heap.add(1, 1);
-        heap.add(1, 2);
+        ArrayHeapMinPQ<Integer> actual = new ArrayHeapMinPQ<>();
+        actual.add(1, 1);
+        actual.add(1, 2);
     }
     @Test (expected = NoSuchElementException.class)
     public void testRemoveSmallest1() {
-        ArrayHeapMinPQ<Integer> heap = new ArrayHeapMinPQ<>();
-        heap.removeSmallest();
+        ArrayHeapMinPQ<Integer> actual = new ArrayHeapMinPQ<>();
+        actual.removeSmallest();
     }
 
     @Test (expected = NoSuchElementException.class)
     public void testGetSmallest1() {
-        ArrayHeapMinPQ<Integer> heap = new ArrayHeapMinPQ<>();
-        heap.getSmallest();
+        ArrayHeapMinPQ<Integer> actual = new ArrayHeapMinPQ<>();
+        actual.getSmallest();
     }
 
     @Test
-    public void testAdd() {
-        ArrayHeapMinPQ<Integer> heap = new ArrayHeapMinPQ<>();
-        assertEquals(0, heap.size());
+    public void testAddAndRemove() {
+        int seed = 999;
+        int num = 100000;
+        int max = 1000000;
+        Random r = new Random(seed);
+        ArrayHeapMinPQ<Integer> testing = new ArrayHeapMinPQ<>();
+        NaiveMinPQ<Integer> expected = new NaiveMinPQ<>();
+        Set<Integer> prioritySet = new HashSet<>();
+        assertEquals(expected.size(), testing.size());
 
-        heap.add(50, 50);
+        for (int i = 0; i < num; i++) {
+            int item = r.nextInt(max);
+            int priority = r.nextInt(max);
+            while (testing.contains(item) || prioritySet.contains(priority)) {
+                item = r.nextInt(max);
+                priority = r.nextInt(max);
+            }
 
-        // add smaller -> become 30, 50
-        heap.add(30, 30);
-        assertEquals(30, (long) heap.getSmallest());
+            testing.add(item, priority);
+            expected.add(item, priority);
+            prioritySet.add(priority);
+        }
 
-        // add larger -> become 30, 50, 70
-        heap.add(70, 70);
-
-        // add middle -> 30, 40, 70, 50
-        heap.add(40, 40);
-
-        heap.add(35, 35);
-        heap.add(60, 60);
-        heap.add(55, 55);
-        heap.add(15, 15);
-        // become 15 30 55 35 40 70 60 50
-        assertEquals(15, (long) heap.getSmallest());
-        assertTrue(heap.contains(55));
-        assertEquals(8, heap.size());
-    }
-
-    @Test (expected = NoSuchElementException.class)
-    public void testRemoveSmallest2() {
-        ArrayHeapMinPQ<Integer> heap = new ArrayHeapMinPQ<>();
-
-        heap.add(50, 50);
-        heap.add(30, 30);
-        heap.add(70, 70);
-        heap.add(40, 40);
-        heap.add(35, 35);
-        heap.add(60, 60);
-        heap.add(55, 55);
-        heap.add(15, 15);
-        heap.add(20, 20);
-        // become 15 20 55 30 40 70 60 50 35
-        assertTrue(heap.contains(15));
-        assertEquals(15, (long) heap.removeSmallest());
-        assertFalse(heap.contains(15));
-        assertEquals(20, (long) heap.removeSmallest());
-        assertEquals(30, (long) heap.removeSmallest());
-        assertEquals(35, (long) heap.removeSmallest());
-        assertEquals(40, (long) heap.removeSmallest());
-        assertEquals(50, (long) heap.removeSmallest());
-        assertEquals(55, (long) heap.removeSmallest());
-        assertEquals(60, (long) heap.removeSmallest());
-        assertEquals(70, (long) heap.removeSmallest());
-        heap.removeSmallest(); // no such element exception
+        for (int i = 0; i < num; i++) {
+            int actual = testing.removeSmallest();
+            int expect = expected.removeSmallest();
+            assertEquals("Fail on iteration " + i, expect, actual);
+        }
     }
 
     @Test
-    public void testChangePriority() {
-        ArrayHeapMinPQ<Integer> heap = new ArrayHeapMinPQ<>();
+    public void testRandomOperation() {
+        int seed = 999;
+        int iteration = 1000000;
+        int max = 10000000;
+        Random r = new Random(seed);
+        ArrayHeapMinPQ<Integer> testing = new ArrayHeapMinPQ<>();
+        NaiveMinPQ<Integer> expected = new NaiveMinPQ<>();
+        List<Integer> itemList = new ArrayList<>();
+        Set<Integer> prioritySet = new HashSet<>();
+        assertEquals(expected.size(), testing.size());
 
-        heap.add(100, 100);
-        heap.add(30, 30);
-        heap.add(50, 50);
-        heap.add(80, 80);
-        heap.add(70, 70);
-        heap.add(20, 20);
-        heap.add(40, 40);
-        heap.add(15, 15);
-        heap.add(10, 10);
-        // 10 15 30 20 80 50 40 100 70
+        for (int i = 0; i < iteration; i++) {
+            int item = r.nextInt(max);
+            int priority = r.nextInt(max);
+            while (testing.contains(item) || prioritySet.contains(priority)) {
+                item = r.nextInt(max);
+                priority = r.nextInt(max);
+            }
+            // add remove size contains changePriority
+            int op = r.nextInt(5);
+            // check if have items to remove
+            if (op == 0) { // add
+                testing.add(item, priority);
+                expected.add(item, priority);
+                itemList.add(item);
+                prioritySet.add(priority);
+            } else if (op == 1) { // remove
+                if (testing.size() == 0) {
+                    i -= 1;
+                    continue;
+                }
+                int actual = testing.removeSmallest();
+                int expect = expected.removeSmallest();
+                itemList.remove((Integer) actual);
+                assertEquals("removeSmallest fail on iteration " + i, expect, actual);
+            } else if (op == 2) { // size
+                int actual = testing.size();
+                int expect = expected.size();
+                assertEquals("size fail on iteration " + i, expect, actual);
+            } else if (op == 3) { // contains
+                int target = r.nextInt(max);
+                boolean actual = testing.contains(target);
+                boolean expect = expected.contains(target);
+                assertEquals("contains fail on iteration " + i, actual, expect);
+            } else if (op == 4) { // change priority
+                int newPriority = r.nextInt(max);
+                if (itemList.size() <= 1) {
+                    i -= 1;
+                    continue;
+                }
+                int index = r.nextInt(itemList.size()-1) + 1;
+                int target = itemList.get(index);
+                while (prioritySet.contains(newPriority)) {
+                    newPriority = r.nextInt(max);
+                }
+                testing.changePriority(target, newPriority);
+                expected.changePriority(target, newPriority);
+            }
 
-        // change priority to smaller than parent's
-        heap.changePriority(20, 13);
-        heap.changePriority(50, 8);
-        assertEquals(50, (long) heap.getSmallest());
-        heap.changePriority(10, 5);
-        assertEquals(10, (long) heap.getSmallest());
-        // 10 20 50 15 80 30 40 100 70
 
-        // change priority but maintain same position
-        heap.changePriority(15, 60);
-        heap.changePriority(30, 35);
-        // 10 20 50 15 80 30 40 100 70
-
-        // change larger larger than children
-        heap.changePriority(15, 150);
-        heap.changePriority(10, 38);
-        // 50 20 30 70 80 10 40 100 15
-
-        assertEquals(50, (long) heap.removeSmallest());
-        assertEquals(20, (long) heap.removeSmallest());
-        assertEquals(30, (long) heap.removeSmallest());
-        assertEquals(10, (long) heap.removeSmallest());
-        assertEquals(40, (long) heap.removeSmallest());
-        assertEquals(70, (long) heap.removeSmallest());
-        assertEquals(80, (long) heap.removeSmallest());
-        assertEquals(100, (long) heap.removeSmallest());
-        assertEquals(15, (long) heap.removeSmallest());
-
+        }
     }
-
 
 }
