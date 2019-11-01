@@ -4,7 +4,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import static org.junit.Assert.assertEquals;
+//import static org.junit.Assert.assertEquals;
 
 public class KDTreePointSetTest {
 
@@ -29,34 +29,42 @@ public class KDTreePointSetTest {
 
     @Test
     public void testRandom() {
-        for (int num = 10; num <= 100000; num *= 10) {
+        for (int num = 10; num <= 10000; num *= 10) {
             double total = 0;
-            for (int j = 0; j < 10; j++) {
+            int c = 0;
+            int times = 100;
+            for (int j = 0; j < times; j++) {
                 List<Point> p = new ArrayList<>();
                 Random r = new Random();
                 for (int i = 0; i < num; i++) {
-                    double x = r.nextDouble() * 2 * num - num;
-                    double y = r.nextDouble() * 2 * num - num;
+                    //double x = r.nextDouble() * 2 * num - num;
+                    //double y = r.nextDouble() * 2 * num - num;
+                    int x = r.nextInt(2 * num) - num;
+                    int y = r.nextInt(2 * num) - num;
                     Point point = new Point(x, y);
                     p.add(point);
                 }
 
-
                 KDTreePointSet actual = new KDTreePointSet(p);
                 NaivePointSet expect = new NaivePointSet(p);
                 long start = System.currentTimeMillis();
-                int correct = 0;
-                for (int i = 0; i < 1000; i++) {
-                    double x = r.nextDouble() * 4 * num - 2 * num;
-                    double y = r.nextDouble() * 4 * num - 2 * num;
-
+                for (int i = 0; i < times; i++) {
+                    //double x = r.nextDouble() * 4 * num - 2 * num;
+                    //double y = r.nextDouble() * 4 * num - 2 * num;
+                    int x = r.nextInt(4 * num) - 2 * num;
+                    int y = r.nextInt(4 * num) - 2 * num;
+                    //System.out.printf("Target = (%d, %d)\n", x, y);
                     actual.nearest(x, y);
+                    if (expect.nearest(x, y).toString().equals(actual.nearest(x, y).toString())) {
+                        c++;
+                    }
 
-                assertEquals(expect.nearest(x, y), actual.nearest(x, y));
+                    //assertEquals(expect.nearest(x, y), actual.nearest(x, y));
                 }
                 total += System.currentTimeMillis() - start;
             }
-            System.out.printf("N = %d, Average = %.4f seconds\n", num, total / 1000.0);
+            System.out.printf("N = %d, Average = %.4f seconds, Accuracy = %.4f%%\n",
+                              num, total / 1000.0, 1.0 * c / times / times * 100);
         }
     }
 

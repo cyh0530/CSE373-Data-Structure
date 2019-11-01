@@ -44,7 +44,7 @@ public class KDTreePointSet implements PointSet {
                 //System.out.print("Level " + level + " --1 Going left looking for ");
                 best = nearest2(target, node.left, best, level + 1);
                 //System.out.println("Level " + level + " --1 best =  " + best);
-                if (node.point.x() - target.x() < distance(best, target)) {
+                if (node.point.x() - target.x() <= distance(best, target)) {
                     //System.out.print("Level " + level + " --2 Going right looking for ");
                     best = nearest2(target, node.right, best, level + 1);
                     //System.out.println("Level " + level + " --2 best =  " + best);
@@ -66,7 +66,7 @@ public class KDTreePointSet implements PointSet {
                 best = nearest2(target, node.left, best, level + 1);
                 //System.out.println("Level " + level + " --5 best =  " + best);
 
-                if (node.point.y() - target.y() < distance(best, target)) {
+                if (node.point.y() - target.y() <= distance(best, target)) {
                     //System.out.print("Level " + level + " --6 Going up looking for ");
                     best = nearest2(target, node.right, best, level + 1);
                     //System.out.println("Level " + level + " --6 best =  " + best);
@@ -78,7 +78,7 @@ public class KDTreePointSet implements PointSet {
                 //System.out.println("Level " + level + " --7 best =  " + best);
                 if (target.y() - node.point.y() < distance(best, target)) {
                     //System.out.print("Level " + level + " --8 Going up looking for ");
-                    best = nearest2(target, node.right, best, level + 1);
+                    best = nearest2(target, node.left, best, level + 1);
                     //System.out.println("Level " + level + " --8 best =  " + best);
                 }
             }
