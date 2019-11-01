@@ -10,9 +10,12 @@ import java.util.NoSuchElementException;
 public class ArrayHeapMinPQ<T> implements ExtrinsicMinPQ<T> {
 
     private List<PriorityNode> priorityHeap;
+    private PriorityNode[] test;
     private Map<T, Integer> indexMap;
 
+    @SuppressWarnings("unchecked")
     public ArrayHeapMinPQ() {
+        test = (PriorityNode[]) new Object[8];
         priorityHeap = new ArrayList<>();
         indexMap = new HashMap<>();
         // empty at index 0

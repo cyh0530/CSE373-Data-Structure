@@ -68,4 +68,5 @@ public class Point {
     public String toString() {
         return String.format("Point x: %.10f, y: %.10f", x, y);
     }
+
 }

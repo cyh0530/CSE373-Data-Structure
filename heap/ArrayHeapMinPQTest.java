@@ -16,6 +16,10 @@ public class ArrayHeapMinPQTest {
      * test for runtime, compare the runtime of NaiveMinPQ vs ArrayHeapMinPQ on
      * a large input of millions of items. */
 
+    @Test
+    public void test2() {
+        ArrayHeapMinPQ<Integer> heap = new ArrayHeapMinPQ<>();
+    }
     @Test (expected = IllegalArgumentException.class)
     public void testAdd1() {
         ArrayHeapMinPQ<Integer> actual = new ArrayHeapMinPQ<>();
@@ -129,4 +133,15 @@ public class ArrayHeapMinPQTest {
         }
     }
 
+    public int f(int n, int m) {
+        if (n < 10) {
+            return 1;
+        }
+        int count = 0;
+        for (int i = 0; i < n % 10; i++) {
+            count += f(n / 10, m / 10);
+        }
+
+        return count;
+    }
 }
