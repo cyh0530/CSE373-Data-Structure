@@ -24,49 +24,71 @@ public class KDTreePointSet implements PointSet {
     @Override
     public Point nearest(double x, double y) {
         Point target = new Point(x, y);
-        return nearest(target, tree.root, tree.root.point, 0, 0);
+        return nearest2(target, tree.root, tree.root.point, 0);
     }
 
-    private Point nearest(Point target, KDTree.KDTreeNode node, Point best, int level, int correctDirection) {
-
+    private Point nearest2(Point target, KDTree.KDTreeNode node, Point best,
+                            int level) {
         if (node == null) {
             return best;
         }
-        if (node.point.distanceSquaredTo(target) < best.distanceSquaredTo(target)) {
+
+        if (Math.sqrt(node.point.distanceSquaredTo(target)) < distance(best, target)) {
             best = node.point;
+            //System.out.printf("Best point = %s, distance = %.4f\n", best, distance(best, target));
         }
 
-        if (correctDirection > -3) {
-            best = nearest(target, node.left, best, level + 1,
-                    calculateDirection(target, node, node.left, correctDirection));
-            best = nearest(target, node.right, best, level + 1,
-                    calculateDirection(target, node, node.right, correctDirection));
+        // compare x
+        if (level % 2 == 0) {
+            if (target.x() < node.point.x()) {
+                //System.out.print("Level " + level + " --1 Going left looking for ");
+                best = nearest2(target, node.left, best, level + 1);
+                //System.out.println("Level " + level + " --1 best =  " + best);
+                if (node.point.x() - target.x() < distance(best, target)) {
+                    //System.out.print("Level " + level + " --2 Going right looking for ");
+                    best = nearest2(target, node.right, best, level + 1);
+                    //System.out.println("Level " + level + " --2 best =  " + best);
 
+                }
+            } else {
+                //System.out.print("Level " + level + " --3 Going right looking for ");
+                best = nearest2(target, node.right, best, level + 1);
+                //System.out.println("Level " + level + " --3 best =  " + best);
+                if (target.x() - node.point.x() < distance(best, target)) {
+                    //System.out.print("Level " + level + " --4 Going left looking for ");
+                    best = nearest2(target, node.left, best, level + 1);
+                    //System.out.println("Level " + level + " --4 best =  " + best);
+                }
+            }
+        } else {
+            if (target.y() < node.point.y()) {
+                //System.out.print("Level " + level + " --5 Going down looking for ");
+                best = nearest2(target, node.left, best, level + 1);
+                //System.out.println("Level " + level + " --5 best =  " + best);
+
+                if (node.point.y() - target.y() < distance(best, target)) {
+                    //System.out.print("Level " + level + " --6 Going up looking for ");
+                    best = nearest2(target, node.right, best, level + 1);
+                    //System.out.println("Level " + level + " --6 best =  " + best);
+
+                }
+            } else {
+                //System.out.print("Level " + level + " --7 Going down looking for ");
+                best = nearest2(target, node.right, best, level + 1);
+                //System.out.println("Level " + level + " --7 best =  " + best);
+                if (target.y() - node.point.y() < distance(best, target)) {
+                    //System.out.print("Level " + level + " --8 Going up looking for ");
+                    best = nearest2(target, node.right, best, level + 1);
+                    //System.out.println("Level " + level + " --8 best =  " + best);
+                }
+            }
         }
-
-
 
         return best;
     }
 
-    private int calculateDirection(Point target, KDTree.KDTreeNode current,
-                                   KDTree.KDTreeNode next, int correctDirection) {
-        if (next != null) {
-            // compare x
-            if ((current.point.x()-target.x()) * (current.point.x() - next.point.x()) > 0) {
-                correctDirection++;
-            } else {
-                correctDirection--;
-            }
-
-            // compare y
-            if ((current.point.y()-target.y()) * (current.point.y() - next.point.y()) > 0) {
-                correctDirection++;
-            } else {
-                correctDirection--;
-            }
-        }
-        return correctDirection;
+    private double distance(Point a, Point b) {
+        return Math.sqrt(a.distanceSquaredTo(b));
     }
 
 

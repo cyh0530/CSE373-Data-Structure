@@ -18,8 +18,7 @@ public class NaivePointSet implements PointSet {
     public NaivePointSet(List<Point> points) {
         pointSet = new ArrayList<>();
         for (Point p: points) {
-            Point newPoint = new Point(p.x(), p.y());
-            pointSet.add(newPoint);
+            pointSet.add(new Point(p.x(), p.y()));
         }
     }
 

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Random;
 import static org.junit.Assert.assertEquals;
 
-
 public class KDTreePointSetTest {
 
     @Test
@@ -30,56 +29,60 @@ public class KDTreePointSetTest {
 
     @Test
     public void testRandom() {
-        for (int j = 0; j < 10; j++) {
-            List<Point> p = new ArrayList<>();
-            Random r = new Random();
-            int num = 10000;
-            for (int i = 0; i < num; i++) {
-                double x = r.nextDouble() * 2 * num - num;
-                double y = r.nextDouble() * 2 * num - num;
-                Point point = new Point(x, y);
-                p.add(point);
-            }
-
-
-            KDTreePointSet actual = new KDTreePointSet(p);
-            NaivePointSet expect = new NaivePointSet(p);
-
-            int correct = 0;
-            for (int i = 0; i < num; i++) {
-                double x = r.nextDouble() * 4 * num - 2 * num;
-                double y = r.nextDouble() * 4 * num - 2 * num;
-                String expectResult = expect.nearest(x, y).toString();
-                String actualResult = actual.nearest(x, y).toString();
-
-                if (expectResult.equals(actualResult)) {
-                    correct++;
-                } else {
-                    System.out.printf("Target = (%d, %d)  ", x, y);
-                    System.out.printf("Expect = %s  ", expectResult);
-                    System.out.printf("Actual = %s\n", actualResult);
+        for (int num = 10; num <= 100000; num *= 10) {
+            double total = 0;
+            for (int j = 0; j < 10; j++) {
+                List<Point> p = new ArrayList<>();
+                Random r = new Random();
+                for (int i = 0; i < num; i++) {
+                    double x = r.nextDouble() * 2 * num - num;
+                    double y = r.nextDouble() * 2 * num - num;
+                    Point point = new Point(x, y);
+                    p.add(point);
                 }
-            assertEquals(expect.nearest(x, y), actual.nearest(x, y));
+
+
+                KDTreePointSet actual = new KDTreePointSet(p);
+                NaivePointSet expect = new NaivePointSet(p);
+                long start = System.currentTimeMillis();
+                int correct = 0;
+                for (int i = 0; i < 1000; i++) {
+                    double x = r.nextDouble() * 4 * num - 2 * num;
+                    double y = r.nextDouble() * 4 * num - 2 * num;
+
+                    actual.nearest(x, y);
+
+                assertEquals(expect.nearest(x, y), actual.nearest(x, y));
+                }
+                total += System.currentTimeMillis() - start;
             }
-
-
+            System.out.printf("N = %d, Average = %.4f seconds\n", num, total / 1000.0);
         }
     }
 
     @Test
     public void testHelp() {
         List<Point> p = new ArrayList<>();
+        p.add(new Point(5, -6));
+        p.add(new Point(-10, 8));
+        p.add(new Point(-14, 10));
+        p.add(new Point(5, -3));
         p.add(new Point(-7, 2));
+        p.add(new Point(8, -4));
+        p.add(new Point(0, 5));
+        p.add(new Point(7, 0));
         p.add(new Point(-2, -4));
+
+        p.add(new Point(9, -4));
 
         KDTreePointSet actual = new KDTreePointSet(p);
         NaivePointSet expect = new NaivePointSet(p);
 
-        int x = -12;
-        int y = -11;
-        System.out.printf("Target = (%d, %d)  ", x, y);
-        System.out.printf("Expect = %s  ", expect.nearest(x, y));
-        System.out.printf("Actual = %s\n", actual.nearest(x, y));
-
+        int x = 0;
+        int y = 0;
+        //System.out.printf("Target = (%d, %d)  ", x, y);
+        //System.out.printf("Expect = %s  ", expect.nearest(x, y));
+        //System.out.printf("Actual = %s\n", actual.nearest(x, y));
+        System.out.println("Nearest = " + actual.nearest(x, y));
     }
 }

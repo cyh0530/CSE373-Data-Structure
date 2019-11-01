@@ -64,9 +64,13 @@ public class Point {
         return Objects.hash(x, y);
     }
 
+//    @Override
+//    public String toString() {
+//        return String.format("Point x: %.10f, y: %.10f", x, y);
+//    }
+
     @Override
     public String toString() {
-        return String.format("Point x: %.10f, y: %.10f", x, y);
+        return String.format("(%.0f, %.0f)", x, y);
     }
-
 }
