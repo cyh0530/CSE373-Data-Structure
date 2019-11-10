@@ -29,7 +29,7 @@ public class KDTreePointSetTest {
 
     @Test
     public void testRandom() {
-        for (int num = 10; num <= 10000; num *= 10) {
+        for (int num = 10; num <= 100000; num *= 10) {
             double total = 0;
             int c = 0;
             int times = 100;

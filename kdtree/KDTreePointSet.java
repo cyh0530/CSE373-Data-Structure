@@ -48,7 +48,6 @@ public class KDTreePointSet implements PointSet {
                     //System.out.print("Level " + level + " --2 Going right looking for ");
                     best = nearest2(target, node.right, best, level + 1);
                     //System.out.println("Level " + level + " --2 best =  " + best);
-
                 }
             } else {
                 //System.out.print("Level " + level + " --3 Going right looking for ");
@@ -90,8 +89,6 @@ public class KDTreePointSet implements PointSet {
     private double distance(Point a, Point b) {
         return Math.sqrt(a.distanceSquaredTo(b));
     }
-
-
 
 
     private class KDTree  {

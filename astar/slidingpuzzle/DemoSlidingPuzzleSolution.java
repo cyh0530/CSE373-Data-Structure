@@ -11,7 +11,7 @@ import astar.SolutionPrinter;
 public class DemoSlidingPuzzleSolution {
 
     public static void main(String[] args) {
-        BoardState start = BoardState.readBoard("data/puzzles/BasicPuzzle1.txt");
+        BoardState start = BoardState.readBoard("data/puzzles/BasicPuzzle0.txt");
         System.out.println(start);
         int N = start.size();
         BoardState goal = BoardState.solved(N);
