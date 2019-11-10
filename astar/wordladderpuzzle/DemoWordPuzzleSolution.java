@@ -10,8 +10,8 @@ import astar.SolutionPrinter;
  */
 public class DemoWordPuzzleSolution {
     public static void main(String[] args) {
-        String start = "horse";
-        String goal = "horse";
+        String start = "nurse";
+        String goal = "nurse";
 
         WordGraph wg = WordGraph.readWords("data/puzzles/words10000.txt");
 

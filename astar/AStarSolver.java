@@ -34,7 +34,7 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
 
         pq.add(start, input.estimatedDistanceToGoal(start, end));
         distTo.put(start, 0.0);
-        edgeTo.put(start, start);
+        edgeTo.put(start, null);
 
         Stopwatch sw = new Stopwatch();
 
@@ -46,8 +46,7 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
                 do {
                     solution.add(0, prev);
                     prev = edgeTo.get(prev);
-                } while (!prev.equals(start));
-
+                } while (prev != null);
                 solutionWeight = distTo.get(end);
 
                 break;
