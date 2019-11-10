@@ -42,14 +42,14 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
             Vertex curr = pq.removeSmallest();
             if (curr.equals(end)) {
                 outcome = SolverOutcome.SOLVED;
-                solution.add(0, curr);
-                Vertex prev = edgeTo.get(curr);
-                while (!prev.equals(start)) {
+                Vertex prev = curr;
+                do {
                     solution.add(0, prev);
                     prev = edgeTo.get(prev);
-                }
-                solution.add(0, prev);
+                } while (!prev.equals(start));
+
                 solutionWeight = distTo.get(end);
+
                 break;
             }
             explored++;
