@@ -56,9 +56,11 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
             List<WeightedEdge<Vertex>> neighbors = input.neighbors(curr);
             for (WeightedEdge<Vertex> e: neighbors) {
                 Vertex next = e.to();
+
                 if (!distTo.containsKey(next)) {
                     distTo.put(next, Double.POSITIVE_INFINITY);
                 }
+
                 if (distTo.get(next) > distTo.get(curr) + e.weight()) {
                     distTo.put(next, distTo.get(curr) + e.weight());
                     edgeTo.put(next, curr);
@@ -70,6 +72,7 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
             }
             if (sw.elapsedTime() > timeout) {
                 outcome = SolverOutcome.TIMEOUT;
+                System.out.println("Timeout");
                 break;
             }
         }

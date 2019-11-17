@@ -3,13 +3,14 @@ package huskymaps;
 import astar.AStarGraph;
 import astar.WeightedEdge;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Arrays;
 
 import static huskymaps.utils.Spatial.greatCircleDistance;
 import static huskymaps.utils.Spatial.projectToX;
@@ -18,10 +19,13 @@ import static huskymaps.utils.Spatial.projectToY;
 public class StreetMapGraph implements AStarGraph<Long> {
     private Map<Long, Node> nodes = new HashMap<>();
     private Map<Long, Set<WeightedEdge<Long>>> neighbors = new HashMap<>();
+    private KDTree tree = new KDTree();
 
     public StreetMapGraph(String filename) {
         OSMGraphHandler.initializeFromXML(this, filename);
-        // TODO
+        for (Long id: nodes.keySet()) {
+            tree.add(nodes.get(id));
+        }
     }
 
     /**
@@ -31,11 +35,9 @@ public class StreetMapGraph implements AStarGraph<Long> {
      * @return The id of the node in the graph closest to the target.
      */
     public long closest(double lat, double lon) {
-        double x = projectToX(lon, lat);
-        double y = projectToY(lon, lat);
-        // Use x and y, not lon and lat, when working with Point instances
-        return 0;
+        return tree.closest(lat, lon).id();
     }
+
 
     /**
      * In linear time, collect all the names of OSM locations that prefix-match the query string.
@@ -44,7 +46,19 @@ public class StreetMapGraph implements AStarGraph<Long> {
      * @return A <code>List</code> of full names of locations matching the <code>prefix</code>.
      */
     public List<String> getLocationsByPrefix(String prefix) {
-        return new LinkedList<>();
+        Node[] nodeList = nodeSortedByName();
+        List<String> result = new LinkedList<>();
+
+        int leftMostIndex = leftMostIndex(nodeList, prefix, 0, nodeList.length, false);
+        int rightMostIndex = rightMostIndex(nodeList, prefix, 0, nodeList.length, false);
+
+        if (leftMostIndex != -1) {
+            for (int i = leftMostIndex; i <= rightMostIndex; i++) {
+                result.add(nodeList[i].name());
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -54,7 +68,140 @@ public class StreetMapGraph implements AStarGraph<Long> {
      * @return A list of locations whose name matches the <code>locationName</code>.
      */
     public List<Node> getLocations(String locationName) {
-        return new LinkedList<>();
+        List<Node> result = new LinkedList<>();
+        Node[] nodeList = nodeSortedByName();
+
+        int leftMostIndex = leftMostIndex(nodeList, locationName, 0, nodeList.length, true);
+        int rightMostIndex = rightMostIndex(nodeList, locationName, 0, nodeList.length, true);
+
+        if (leftMostIndex != -1) {
+            for (int i = leftMostIndex; i <= rightMostIndex; i++) {
+                result.add(nodeList[i]);
+            }
+        }
+
+        return result;
+
+    }
+
+    private int leftMostIndex(Node[] nodeList, String prefix, int left, int right, boolean findExactMatch) {
+
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            String currentPrefix = nodeList[mid].name().toLowerCase();
+            if (currentPrefix.length() > prefix.length()){
+                currentPrefix = currentPrefix.substring(0, prefix.length());
+            }
+            if (isLeftMost(nodeList, prefix, currentPrefix, mid, findExactMatch)) {
+                return mid;
+            } else if (currentPrefix.compareTo(prefix.toLowerCase()) < 0) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+
+        return -1;
+    }
+
+    private boolean isLeftMost(Node[] nodeList, String prefix, String currentPrefix, int mid, boolean findExactMatch) {
+        if (mid == 0) {
+            return true;
+        }
+        String previousPrefix = nodeList[mid - 1].name().toLowerCase();
+        if (previousPrefix.length() > prefix.length()){
+            previousPrefix = previousPrefix.substring(0, prefix.length());
+        }
+        if (findExactMatch) {
+            return prefix.toLowerCase().compareTo(previousPrefix) > 0 && prefix.equalsIgnoreCase(nodeList[mid].name());
+        } else {
+            return prefix.toLowerCase().compareTo(previousPrefix) > 0
+                    && prefix.equalsIgnoreCase(currentPrefix);
+        }
+    }
+
+    private int rightMostIndex(Node[] nodeList, String prefix, int left, int right, boolean findExactMatch) {
+
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            String currentPrefix = nodeList[mid].name().toLowerCase();
+            if (currentPrefix.length() > prefix.length()){
+                currentPrefix = currentPrefix.substring(0, prefix.length());
+            }
+            if (isRightMost(nodeList, prefix, currentPrefix, mid, findExactMatch)) {
+                return mid;
+            } else if (currentPrefix.compareTo(prefix.toLowerCase()) > 0) {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+
+        return -1;
+    }
+
+    private boolean isRightMost(Node[] nodeList, String prefix, String currentPrefix, int mid, boolean findExactMatch) {
+        if (mid == nodeList.length - 1) {
+            return true;
+        }
+        String nextPrefix = nodeList[mid + 1].name().toLowerCase();
+        if (nextPrefix.length() > prefix.length()){
+            nextPrefix = nextPrefix.substring(0, prefix.length());
+        }
+        if (findExactMatch) {
+            return prefix.toLowerCase().compareTo(nextPrefix) < 0 && prefix.equalsIgnoreCase(nodeList[mid].name());
+        } else {
+            return prefix.toLowerCase().compareTo(nextPrefix) < 0
+                    && prefix.equalsIgnoreCase(currentPrefix);
+        }
+    }
+
+    private Node[] nodeSortedByName() {
+
+        int haveName = 0;
+        for (Long id: nodes.keySet()) {
+            if (nodes.get(id).name() != null) {
+                haveName++;
+            }
+        }
+        int i = 0;
+        Node[] nodeList = new Node[haveName];
+        for (Long id: nodes.keySet()) {
+            if (nodes.get(id).name() != null) {
+                nodeList[i] = nodes.get(id);
+                i++;
+            }
+        }
+        mergeSort(nodeList);
+
+        return nodeList;
+    }
+
+    private void mergeSort(Node[] nodeList) {
+        if (nodeList.length > 1) {
+
+            Node[] left = Arrays.copyOfRange(nodeList, 0, nodeList.length / 2);
+            Node[] right = Arrays.copyOfRange(nodeList, nodeList.length / 2, nodeList.length);
+
+            mergeSort(left);
+            mergeSort(right);
+            merge(nodeList, left, right);
+        }
+    }
+
+    private void merge(Node[] nodeList, Node[] left, Node[] right) {
+        int i1 = 0;
+        int i2 = 0;
+        for (int i = 0; i < nodeList.length; i++) {
+
+            if (i2 >= right.length || (i1 < left.length && left[i1].name().compareTo(right[i2].name()) < 0)) {
+                nodeList[i] = left[i1];
+                i1++;
+            } else {
+                nodeList[i] = right[i2];
+                i2++;
+            }
+        }
     }
 
     /** Returns a list of outgoing edges for V. Assumes V exists in this graph. */
@@ -146,5 +293,108 @@ public class StreetMapGraph implements AStarGraph<Long> {
 
     Node.Builder nodeBuilder() {
         return new Node.Builder();
+    }
+
+    private class KDTree {
+
+        public KDTreeNode root;
+
+        public KDTree() {
+            this.root = null;
+        }
+
+        public void add(Node n) {
+            root = this.add(n, root, true);
+        }
+
+        private KDTreeNode add(Node n, KDTreeNode node, boolean evenLevel) {
+            if (node == null) {
+                return new KDTreeNode(n);
+            }
+
+            double compare = comparePoints(n, node.node, evenLevel);
+            // equal coordinate will categorize to right node, which is top and right
+            // first compare x then compare y
+            if (evenLevel) {
+                // compare x
+                if (compare < 0) {
+                    node.left = add(n, node.left, false);
+                } else {
+                    node.right = add(n, node.right, false);
+                }
+            } else {
+                // compare y
+                if (compare < 0) {
+                    node.left = add(n, node.left, true);
+                } else {
+                    node.right = add(n, node.right, true);
+                }
+            }
+            return node;
+
+        }
+
+        public Node closest(double lon, double lat) {
+            Node target = new Node(0, lon, lat, "", 0);
+            return closest(target, root, root.node, true);
+        }
+
+
+        private Node closest(Node target, KDTree.KDTreeNode node, Node best, boolean evenLevel) {
+            if (node == null) {
+                return best;
+            }
+
+            if (distance(node.node, target) < distance(best, target)
+                && neighbors.containsKey(node.node.id()) && neighbors.get(node.node.id()).size() != 0) {
+                best = node.node;
+            }
+
+            double toSeparation = comparePoints(target, node.node, evenLevel);
+
+            if (toSeparation < 0) {
+                best = closest(target, node.left, best, !evenLevel);
+
+                if (toSeparation <= distance(best, target)) {
+                    best = closest(target, node.right, best, !evenLevel);
+                }
+            } else {
+                best = closest(target, node.right, best, !evenLevel);
+
+                if (toSeparation <= distance(best, target)) {
+                    best = closest(target, node.left, best, !evenLevel);
+                }
+            }
+            return best;
+        }
+
+        private double distance(Node node, Node target) {
+            double x = projectToX(node.lon(), node.lat());
+            double y = projectToY(node.lon(), node.lat());
+            double targetX = projectToX(target.lon(), target.lat());
+            double targetY = projectToY(target.lon(), target.lat());
+            return Math.sqrt((x - targetX) * (x - targetX) + (y - targetY) * (y - targetY));
+        }
+
+        private double comparePoints(Node target, Node node, boolean evenLevel) {
+            if (evenLevel) {
+                return projectToX(target.lon(), target.lat()) - projectToX(node.lon(), node.lat());
+            } else {
+                return projectToY(target.lon(), target.lat()) - projectToY(node.lon(), node.lat());
+            }
+        }
+
+        private class KDTreeNode {
+
+            public Node node;
+            public KDTreeNode left;
+            public KDTreeNode right;
+
+            public KDTreeNode(Node node) {
+                this.node = node;
+                left = null;
+                right = null;
+            }
+        }
     }
 }

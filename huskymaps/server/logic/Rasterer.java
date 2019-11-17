@@ -5,6 +5,12 @@ import huskymaps.params.RasterResult;
 
 import java.util.Objects;
 
+import static huskymaps.utils.Constants.NUM_X_TILES_AT_DEPTH;
+import static huskymaps.utils.Constants.NUM_Y_TILES_AT_DEPTH;
+import static huskymaps.utils.Constants.ROOT_LON_DIFF;
+import static huskymaps.utils.Constants.ROOT_LAT_DIFF;
+import static huskymaps.utils.Constants.ROOT_ULLON;
+import static huskymaps.utils.Constants.ROOT_ULLAT;
 import static huskymaps.utils.Constants.MIN_X_TILE_AT_DEPTH;
 import static huskymaps.utils.Constants.MIN_Y_TILE_AT_DEPTH;
 import static huskymaps.utils.Constants.MIN_ZOOM_LEVEL;
@@ -31,9 +37,23 @@ public class Rasterer {
      * @return RasterResult
      */
     public static RasterResult rasterizeMap(RasterRequest request) {
-        System.out.println("Since you haven't implemented rasterizeMap, nothing is displayed in your browser.");
-        // TODO
-        Tile[][] grid = null;
+        int depth = request.depth;
+        int xTiles = NUM_X_TILES_AT_DEPTH[depth];
+        int yTiles = NUM_Y_TILES_AT_DEPTH[depth];
+        double xTileWidth = ROOT_LON_DIFF / xTiles;
+        double yTileWidth = ROOT_LAT_DIFF / yTiles;
+        int ullon = (int) (Math.abs(request.ullon - ROOT_ULLON) / xTileWidth);
+        int ullat = (int) (Math.abs(request.ullat - ROOT_ULLAT) / yTileWidth);
+        int lrlon = (int) (Math.abs(request.lrlon - ROOT_ULLON) / xTileWidth);
+        int lrlat = (int) (Math.abs(request.lrlat - ROOT_ULLAT) / yTileWidth);
+
+        Tile[][] grid = new Tile[lrlat - ullat + 1][lrlon - ullon + 1];
+
+        for (int i = 0; i < lrlat - ullat + 1; i++) {
+            for (int j = 0; j < lrlon - ullon + 1; j++) {
+                grid[i][j] = new Tile(depth, ullon + j, ullat + i);
+            }
+        }
         return new RasterResult(grid);
     }
 
@@ -96,7 +116,7 @@ public class Rasterer {
 
         @Override
         public String toString() {
-            return "d" + depth + "_x" + x + "_y" + y + ".jpg";
+            return "d" + depth + "_x" + x + "_y" + y + ".jpg\n";
         }
     }
 }

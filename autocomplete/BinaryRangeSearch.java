@@ -94,7 +94,7 @@ public class BinaryRangeSearch implements Autocomplete {
         return -1;
     }
 
-    private  int rightMostIndex(Term prefixTerm, int left, int right) {
+    private int rightMostIndex(Term prefixTerm, int left, int right) {
         while (left <= right) {
             int mid = (left + right) / 2;
             int length = prefixTerm.query().length();

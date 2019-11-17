@@ -24,6 +24,8 @@ public class TestRouterTiny {
         }
         tinyGraph = new StreetMapGraph(OSM_DB_PATH_TINY);
         initialized = true;
+
+
     }
 
     @Test

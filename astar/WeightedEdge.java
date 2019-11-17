@@ -33,4 +33,8 @@ public class WeightedEdge<Vertex> {
     public String name() {
         return name;
     }
+
+    public String toString() {
+        return String.format("From %s to %s, weight = %f", v.toString(), w.toString(), weight);
+    }
 }
