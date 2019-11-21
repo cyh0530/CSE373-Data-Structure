@@ -106,6 +106,7 @@ public class RasterAPIHandler extends APIRouteHandler<RasterRequest, RenderedRas
 
     private static BufferedImage getTile(Rasterer.Tile name) {
         String path = IMG_ROOT + name;
+        System.out.print(path);
         BufferedImage tile = null;
         try {
             File in = new File(path);

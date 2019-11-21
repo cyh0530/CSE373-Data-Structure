@@ -20,12 +20,13 @@ public class StreetMapGraph implements AStarGraph<Long> {
     private Map<Long, Node> nodes = new HashMap<>();
     private Map<Long, Set<WeightedEdge<Long>>> neighbors = new HashMap<>();
     private KDTree tree = new KDTree();
-
+    private Node[] nodeList;
     public StreetMapGraph(String filename) {
         OSMGraphHandler.initializeFromXML(this, filename);
         for (Long id: nodes.keySet()) {
             tree.add(nodes.get(id));
         }
+        nodeList = nodeSortedByName();
     }
 
     /**
@@ -46,11 +47,10 @@ public class StreetMapGraph implements AStarGraph<Long> {
      * @return A <code>List</code> of full names of locations matching the <code>prefix</code>.
      */
     public List<String> getLocationsByPrefix(String prefix) {
-        Node[] nodeList = nodeSortedByName();
         List<String> result = new LinkedList<>();
 
-        int leftMostIndex = leftMostIndex(nodeList, prefix, 0, nodeList.length, false);
-        int rightMostIndex = rightMostIndex(nodeList, prefix, 0, nodeList.length, false);
+        int leftMostIndex = leftMostIndex(prefix, 0, nodeList.length, false);
+        int rightMostIndex = rightMostIndex(prefix, 0, nodeList.length, false);
 
         if (leftMostIndex != -1) {
             for (int i = leftMostIndex; i <= rightMostIndex; i++) {
@@ -69,10 +69,9 @@ public class StreetMapGraph implements AStarGraph<Long> {
      */
     public List<Node> getLocations(String locationName) {
         List<Node> result = new LinkedList<>();
-        Node[] nodeList = nodeSortedByName();
 
-        int leftMostIndex = leftMostIndex(nodeList, locationName, 0, nodeList.length, true);
-        int rightMostIndex = rightMostIndex(nodeList, locationName, 0, nodeList.length, true);
+        int leftMostIndex = leftMostIndex(locationName, 0, nodeList.length, true);
+        int rightMostIndex = rightMostIndex(locationName, 0, nodeList.length, true);
 
         if (leftMostIndex != -1) {
             for (int i = leftMostIndex; i <= rightMostIndex; i++) {
@@ -84,7 +83,7 @@ public class StreetMapGraph implements AStarGraph<Long> {
 
     }
 
-    private int leftMostIndex(Node[] nodeList, String prefix, int left, int right, boolean findExactMatch) {
+    private int leftMostIndex(String prefix, int left, int right, boolean findExactMatch) {
 
         while (left <= right) {
             int mid = (left + right) / 2;
@@ -92,7 +91,7 @@ public class StreetMapGraph implements AStarGraph<Long> {
             if (currentPrefix.length() > prefix.length()){
                 currentPrefix = currentPrefix.substring(0, prefix.length());
             }
-            if (isLeftMost(nodeList, prefix, currentPrefix, mid, findExactMatch)) {
+            if (isLeftMost(prefix, currentPrefix, mid, findExactMatch)) {
                 return mid;
             } else if (currentPrefix.compareTo(prefix.toLowerCase()) < 0) {
                 left = mid + 1;
@@ -104,7 +103,7 @@ public class StreetMapGraph implements AStarGraph<Long> {
         return -1;
     }
 
-    private boolean isLeftMost(Node[] nodeList, String prefix, String currentPrefix, int mid, boolean findExactMatch) {
+    private boolean isLeftMost(String prefix, String currentPrefix, int mid, boolean findExactMatch) {
         if (mid == 0) {
             return true;
         }
@@ -120,7 +119,7 @@ public class StreetMapGraph implements AStarGraph<Long> {
         }
     }
 
-    private int rightMostIndex(Node[] nodeList, String prefix, int left, int right, boolean findExactMatch) {
+    private int rightMostIndex(String prefix, int left, int right, boolean findExactMatch) {
 
         while (left <= right) {
             int mid = (left + right) / 2;
@@ -128,7 +127,7 @@ public class StreetMapGraph implements AStarGraph<Long> {
             if (currentPrefix.length() > prefix.length()){
                 currentPrefix = currentPrefix.substring(0, prefix.length());
             }
-            if (isRightMost(nodeList, prefix, currentPrefix, mid, findExactMatch)) {
+            if (isRightMost(prefix, currentPrefix, mid, findExactMatch)) {
                 return mid;
             } else if (currentPrefix.compareTo(prefix.toLowerCase()) > 0) {
                 right = mid - 1;
@@ -140,7 +139,7 @@ public class StreetMapGraph implements AStarGraph<Long> {
         return -1;
     }
 
-    private boolean isRightMost(Node[] nodeList, String prefix, String currentPrefix, int mid, boolean findExactMatch) {
+    private boolean isRightMost(String prefix, String currentPrefix, int mid, boolean findExactMatch) {
         if (mid == nodeList.length - 1) {
             return true;
         }
@@ -165,40 +164,40 @@ public class StreetMapGraph implements AStarGraph<Long> {
             }
         }
         int i = 0;
-        Node[] nodeList = new Node[haveName];
+        Node[] result = new Node[haveName];
         for (Long id: nodes.keySet()) {
             if (nodes.get(id).name() != null) {
-                nodeList[i] = nodes.get(id);
+                result[i] = nodes.get(id);
                 i++;
             }
         }
-        mergeSort(nodeList);
+        mergeSort(result);
 
-        return nodeList;
+        return result;
     }
 
-    private void mergeSort(Node[] nodeList) {
-        if (nodeList.length > 1) {
+    private void mergeSort(Node[] list) {
+        if (list.length > 1) {
 
-            Node[] left = Arrays.copyOfRange(nodeList, 0, nodeList.length / 2);
-            Node[] right = Arrays.copyOfRange(nodeList, nodeList.length / 2, nodeList.length);
+            Node[] left = Arrays.copyOfRange(list, 0, list.length / 2);
+            Node[] right = Arrays.copyOfRange(list, list.length / 2, list.length);
 
             mergeSort(left);
             mergeSort(right);
-            merge(nodeList, left, right);
+            merge(list, left, right);
         }
     }
 
-    private void merge(Node[] nodeList, Node[] left, Node[] right) {
+    private void merge(Node[] list, Node[] left, Node[] right) {
         int i1 = 0;
         int i2 = 0;
-        for (int i = 0; i < nodeList.length; i++) {
+        for (int i = 0; i < list.length; i++) {
 
             if (i2 >= right.length || (i1 < left.length && left[i1].name().compareTo(right[i2].name()) < 0)) {
-                nodeList[i] = left[i1];
+                list[i] = left[i1];
                 i1++;
             } else {
-                nodeList[i] = right[i2];
+                list[i] = right[i2];
                 i2++;
             }
         }

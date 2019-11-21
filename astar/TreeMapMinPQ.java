@@ -92,4 +92,12 @@ public class TreeMapMinPQ<T> implements ExtrinsicMinPQ<T> {
     public int size() {
         return itemToPriority.size();
     }
+
+    public String toString() {
+        String result = "";
+        for (Double n: priorityToItem.keySet()) {
+            result += priorityToItem.get(n).toString();
+        }
+        return result;
+    }
 }

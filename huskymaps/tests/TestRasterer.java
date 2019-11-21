@@ -47,9 +47,4 @@ public class TestRasterer {
             );
         }
     }
-
-    @Test
-    public void test() {
-        System.out.println("Test".compareTo("Testing"));
-    }
 }

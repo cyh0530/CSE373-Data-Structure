@@ -116,7 +116,7 @@ public class Rasterer {
 
         @Override
         public String toString() {
-            return "d" + depth + "_x" + x + "_y" + y + ".jpg\n";
+            return "d" + depth + "_x" + x + "_y" + y + ".jpg";
         }
     }
 }
