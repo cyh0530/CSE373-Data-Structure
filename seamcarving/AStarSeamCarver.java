@@ -53,13 +53,13 @@ public class AStarSeamCarver implements SeamCarver {
         int bot   = y + 1;
         if (left == -1) {
             left = width - 1;
-        } else if (right == width) {
+        } else if (right >= width) {
             right = 0;
         }
 
         if (top == -1) {
             top = height - 1;
-        } else if (bot == height) {
+        } else if (bot >= height) {
             bot = 0;
         }
 
@@ -91,12 +91,10 @@ public class AStarSeamCarver implements SeamCarver {
         PixelGraph graph = new PixelGraph(horizontal);
         Pixel start = getStart(graph, horizontal);
         Pixel end = getEnd(graph, horizontal);
-//        System.out.println("start = " + start);
-//        System.out.println("end = " + end);
 
         ShortestPathsSolver<Pixel> solver = new AStarSolver<>(graph, start, end, 10);
         List<Pixel> solution = solver.solution();
-//        System.out.println(solution);
+
         int[] result = new int[solution.size() - 2];
         for (int i = 0; i < solution.size() - 2; i++) {
             if (horizontal) {
@@ -188,14 +186,6 @@ public class AStarSeamCarver implements SeamCarver {
                     }
                 }
             }
-
-//            System.out.println("Energy -");
-//            for (int x = 0; x < energies.length; x++) {
-//                for (int y = 0; y < energies[0].length; y++) {
-//                    System.out.printf("%.2f ", energies[x][y].energy);
-//                }
-//                System.out.println();
-//            }
         }
 
         @Override
