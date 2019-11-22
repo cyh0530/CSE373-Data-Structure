@@ -39,6 +39,7 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
         Stopwatch sw = new Stopwatch();
 
         while (!pq.isEmpty()) {
+            // System.out.println(pq);
             Vertex curr = pq.removeSmallest();
             if (curr.equals(end)) {
                 outcome = SolverOutcome.SOLVED;

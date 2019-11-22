@@ -45,7 +45,8 @@ public class SanityCheckTest {
 
         int[] seam = sc.findVerticalSeam();
         int[] expected = {3, 4, 3, 2, 2};
-        //sc.removeVerticalSeam(seam);
+
+        sc.removeVerticalSeam(seam);
         //p.show();
         //Scanner console = new Scanner(System.in);
         //console.next();

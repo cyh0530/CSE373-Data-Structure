@@ -13,8 +13,8 @@ import java.awt.event.KeyEvent;
  * Shows the sequence of seams being removed.
  */
 public class SeamCarverVisualizer {
-    private static final String IMAGE_PATH = "data/images/HJoceanSmall.png";
-    private static final int NUM_PIXELS = 150;
+    private static final String IMAGE_PATH = "data/images/6x5.png";
+    private static final int NUM_PIXELS = 5;
     private static final boolean HORIZONTAL_SEAM = true;
     JFrame frame;
 

@@ -43,6 +43,8 @@ public class AStarSeamCarver implements SeamCarver {
     public double energy(int x, int y) {
         int width = width();
         int height = height();
+        // System.out.println("Energy - ");
+        // System.out.printf("width = %d, height = %d, (x, y) = (%d, %d), ", width, height, x, y);
         if (x < 0 || x >= width || y < 0 || y >= height) {
             throw new IndexOutOfBoundsException();
         }
@@ -51,22 +53,31 @@ public class AStarSeamCarver implements SeamCarver {
         int right = x + 1;
         int top   = y - 1;
         int bot   = y + 1;
+        // System.out.printf("BEFORE = left = %d, right = %d, top = %d, bot = %d --> ", left, right, top, bot);
         if (left == -1) {
             left = width - 1;
-        } else if (right >= width) {
+        }
+
+        if (right >= width) {
             right = 0;
         }
 
         if (top == -1) {
             top = height - 1;
-        } else if (bot >= height) {
+        }
+
+        if (bot >= height) {
             bot = 0;
         }
+
+        // System.out.printf("AFTER = left = %d, right = %d, top = %d, bot = %d\n", left, right, top, bot);
 
         Color pixelLeft = picture.get(left, y);
         Color pixelRight = picture.get(right, y);
         Color pixelTop = picture.get(x, top);
         Color pixelBot = picture.get(x, bot);
+
+        // System.out.printf("Left = %s, Right = %s, Top = %s, Bot = %s\n", pixelLeft, pixelRight, pixelTop, pixelBot);
 
         double deltaXSquare = Math.pow(pixelLeft.getRed() - pixelRight.getRed(), 2) +
                               Math.pow(pixelLeft.getGreen() - pixelRight.getGreen(), 2) +
@@ -74,7 +85,8 @@ public class AStarSeamCarver implements SeamCarver {
         double deltaYSquare = Math.pow(pixelTop.getRed() - pixelBot.getRed(), 2) +
                               Math.pow(pixelTop.getGreen() - pixelBot.getGreen(), 2) +
                               Math.pow(pixelTop.getBlue() - pixelBot.getBlue(), 2);
-
+        // System.out.println("   = " + Math.sqrt(deltaXSquare + deltaYSquare));
+        // System.out.println();
         return Math.sqrt(deltaXSquare + deltaYSquare);
 
     }
@@ -164,9 +176,12 @@ public class AStarSeamCarver implements SeamCarver {
                         if (y != energies[0].length - 1) {
                             energies[x][y].addNeighbors(energies[x + 1][y + 1]);
                         }
-                        // calculate last x energy
-                        energies[energies.length - 1][y].energy(energy(energies.length - 1, y));
                     }
+                }
+
+                for (int y = 0; y < energies[0].length; y++) {
+                    // calculate last x energy
+                    energies[energies.length - 1][y].energy(energy(energies.length - 1, y));
                 }
             } else {
                 for (int x = 0; x < energies.length; x++) {
@@ -181,20 +196,35 @@ public class AStarSeamCarver implements SeamCarver {
                         if (x != energies.length - 1) {
                             energies[x][y].addNeighbors(energies[x + 1][y + 1]);
                         }
-                        // calculate last y energy
-                        energies[x][energies[0].length - 1].energy(energy(x, energies[0].length - 1));
+
                     }
                 }
+
+                for (int x = 0; x < energies.length; x++) {
+                    // calculate last y energy
+                    energies[x][energies[0].length - 1].energy(energy(x, energies[0].length - 1));
+                }
             }
+
+            // System.out.println("PIXEL GRAPH CONSTRUCTOR - ");
+            // for (int x = 0; x < energies.length; x++) {
+            //     for (int y = 0; y < energies[0].length; y++) {
+            //         System.out.printf("%s -> %s\n", energies[x][y], energies[x][y].neighbors);
+            //     }
+            // }
         }
 
         @Override
         public List<WeightedEdge<Pixel>> neighbors(Pixel v) {
             List<Pixel> neighbors = v.neighbors;
             List<WeightedEdge<Pixel>> neighborEdges = new ArrayList<>();
+            // System.out.println();
+            // System.out.println("NEIGHBORS");
             for (Pixel neighbor: neighbors) {
+                // System.out.println(neighbor);
                 neighborEdges.add(new WeightedEdge<>(v, neighbor, neighbor.energy));
             }
+            // System.out.println();
             return neighborEdges;
         }
 
@@ -235,7 +265,7 @@ public class AStarSeamCarver implements SeamCarver {
         public List<Pixel> getNeighbors() { return neighbors; }
 
         public String toString() {
-            return String.format("(%d, %d, %.4f)", x, y, energy);
+            return String.format("(%d, %d, %.2f)", x, y, energy);
         }
     }
 }
